@@ -41,3 +41,19 @@ Below you'll find all available options for the `.altvpkgrc.json` file with thei
     "loadVoiceServer": false
 }
 ```
+
+## Possible parameters
+
+### Path
+
+There is possibility to provide the path where bins will be installed. You should provide `--path=your-path` flag.
+
+**Note:** If path is not provided current directory will be used by default
+
+**Note:** If provided directory doesn't exist, script will create it
+
+Below you can find example of usage:
+
+```
+npx altv-pkg --path=./bins
+```

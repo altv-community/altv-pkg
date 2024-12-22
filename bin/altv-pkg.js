@@ -12,7 +12,7 @@ const CDN_ADDRESS = 'cdn.alt-mp.com';
 const DISCORD_ID = '580868196270342175';
 
 const args = process.argv;
-const rootPath = process.cwd();
+let rootPath = process.cwd();
 
 let platform = process.platform == 'win32' ? 'x64_win32' : 'x64_linux';
 let branch = null;
@@ -92,11 +92,30 @@ for (let i = 0; i < args.length; i++) {
         platform = 'x64_linux';
         continue;
     }
+
+    if (args[i].startsWith('--path=')) {
+        const targetPath = args[i].split('=')?.at(1)
+        if (!targetPath) {
+            throw new Error('Target path cannot be empty.');
+        }
+
+        rootPath = path.join(rootPath, targetPath);
+
+        continue;
+    }
 }
 
 if (!branch) {
     branch = 'release';
     console.log(chalk.yellowBright('Branch not specified, using release'));
+}
+
+if (rootPath !== process.cwd()) {
+    console.log(chalk.yellowBright(`Using ${rootPath} as a root path`));
+
+    if (!fs.existsSync(rootPath)) {
+        fs.mkdirSync(rootPath)
+    }
 }
 
 /**
@@ -416,7 +435,7 @@ function loadRuntimeConfig() {
     let loadVoiceServer = false;
 
     try {
-        const data = fs.readFileSync(`./${RC_FILE_NAME}`, { encoding: 'utf8' });
+        const data = fs.readFileSync(path.join(rootPath, `./${RC_FILE_NAME}`), { encoding: 'utf8' });
         const parsedData = JSON.parse(data);
 
         if (typeof parsedData.loadJSModule !== 'undefined') {
